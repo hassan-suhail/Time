@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeChart - July</title>
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 8px;
+            text-align: left;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+        }
+        .login-form {
+            display: none;
+        }
+        .edit-button {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>TimeChart - July</h1>
+    <table id="timechart">
+        <!-- Table rows will be inserted here by JavaScript -->
+    </table>
+
+    <button id="loginBtn">Login</button>
+
+    <div class="login-form">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username"><br><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password"><br><br>
+        <button onclick="login()">Submit</button>
+    </div>
+
+    <button class="edit-button" onclick="saveTable()">Save Table</button>
+
+    <script>
+        document.getElementById('loginBtn').addEventListener('click', function() {
+            document.querySelector('.login-form').style.display = 'block';
+        });
+
+        function loadTable() {
+            fetch('/table')
+                .then(response => response.json())
+                .then(data => {
+                    const table = document.getElementById('timechart');
+                    table.innerHTML = '';
+                    data.forEach(row => {
+                        const tr = document.createElement('tr');
+                        row.forEach(cell => {
+                            const td = document.createElement('td');
+                            td.textContent = cell;
+                            tr.appendChild(td);
+                        });
+                        table.appendChild(tr);
+                    });
+                });
+        }
+
+        function login() {
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.querySelector('.login-form').style.display = 'none';
+                    document.querySelector('.edit-button').style.display = 'block';
+                    alert('Login successful. You are now an editor.');
+                    enableEditing();
+                } else {
+                    alert('Invalid credentials. Please try again.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function enableEditing() {
+            var table = document.getElementById('timechart');
+            var cells = table.getElementsByTagName('td');
+
+            for (var i = 0; i < cells.length; i++) {
+                cells[i].contentEditable = 'true';
+            }
+
+            alert('You can now edit the table');
+        }
+
+        function saveTable() {
+            var table = document.getElementById('timechart');
+            var rows = table.getElementsByTagName('tr');
+            var tableData = [];
+
+            for (var i = 0; i < rows.length; i++) {
+                var cells = rows[i].getElementsByTagName('td');
+                var rowData = [];
+                for (var j = 0; j < cells.length; j++) {
+                    rowData.push(cells[j].textContent);
+                }
+                tableData.push(rowData);
+            }
+
+            fetch('/table', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ tableData }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Table saved successfully.');
+                } else {
+                    alert('Error saving table.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        document.addEventListener('DOMContentLoaded', loadTable);
+    </script>
+</body>
+</html>
