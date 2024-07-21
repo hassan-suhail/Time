@@ -27,12 +27,12 @@
     <h1>TimeChart - July</h1>
     <table id="timechart">
         <tr>
-            <td>lore</td>
-            <td>lore1</td>
+            <td>lorem</td>
+            <td>lorem</td>
         </tr>
         <tr>
             <td>lorem</td>
-            <td>lore1</td>
+            <td>lorem</td>
         </tr>
         <tr>
             <td>lorem</td>
@@ -47,6 +47,7 @@
             <td>lorem</td>
         </tr>
     </table>
+
 
     <button id="loginBtn">Login</button>
 
@@ -66,7 +67,7 @@
         });
 
         function loadTable() {
-            fetch('/table')
+            fetch('/api/table')
                 .then(response => response.json())
                 .then(data => {
                     const table = document.getElementById('timechart');
@@ -87,7 +88,7 @@
             var username = document.getElementById('username').value;
             var password = document.getElementById('password').value;
 
-            fetch('/login', {
+            fetch('/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -133,7 +134,7 @@
                 tableData.push(rowData);
             }
 
-            fetch('/table', {
+            fetch('/api/table', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
